@@ -41,7 +41,7 @@ namespace Encrypter2
             Console.WriteLine("Co chcesz zrobić?");
             Console.WriteLine("1 - Szyfrowanie");
             Console.WriteLine("2 - Wybór i odszyfrowanie pliku");
-            Console.WriteLine("3 - Instalacja/aktualizacja na pendrive (umieść plik Player.zip w folderze aplikacji)");
+            Console.WriteLine("3 - Instalacja/aktualizacja na pendrive (umieść wcześniej plik Player.zip w folderze aplikacji)");
             string choice = Console.ReadLine();
 
             if (choice == "1")
@@ -142,10 +142,12 @@ namespace Encrypter2
                     }
 
                     Console.WriteLine("Pliki z ZIP-a zostały skopiowane.");
+                    Console.ReadKey();
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Błąd: {ex.Message}");
+                    Console.ReadKey();
                 }
             }
             else
@@ -154,7 +156,11 @@ namespace Encrypter2
                 Console.ReadKey();
             }
         }
-
+        /// <summary>
+        /// Function gets drive letter by drive label
+        /// </summary>
+        /// <param name="label">Drive label</param>
+        /// <returns>String with drive letter</returns>
         static string GetDriveLetterByLabel(string label)
         {
             foreach (DriveInfo drive in DriveInfo.GetDrives())
@@ -197,7 +203,7 @@ namespace Encrypter2
         static void EncryptFile(string inputFile, string outputFile, string keyString)
         {
             byte[] key = Encoding.UTF8.GetBytes(keyString.Substring(0, 16));
-            byte[] iv = Encoding.UTF8.GetBytes("1234567812345678");
+            byte[] iv = Encoding.UTF8.GetBytes("1234567812345678"); // TODO: Make this randomized
 
             using (Aes aes = Aes.Create())
             {
@@ -216,7 +222,7 @@ namespace Encrypter2
         static byte[] DecryptFileToMemory(string inputFile, string keyString)
         {
             byte[] key = Encoding.UTF8.GetBytes(keyString.Substring(0, 16));
-            byte[] iv = Encoding.UTF8.GetBytes("1234567812345678");
+            byte[] iv = Encoding.UTF8.GetBytes("1234567812345678"); // TODO: Make this randomized
 
             using (Aes aes = Aes.Create())
             {
