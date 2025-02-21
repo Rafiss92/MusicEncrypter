@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Encrypter2Player.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Key" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">EMTEC B120</Value>
+    </Setting>
+    <Setting Name="Katalog" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">\music\</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
