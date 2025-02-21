@@ -115,8 +115,6 @@ namespace Encrypter2
             {
                 string appFolder = AppDomain.CurrentDomain.BaseDirectory;
                 string sourceZip = Path.Combine(appFolder, "Player.zip");
-                //string sourceZip = @"C:\ścieżka\do\archiwum.zip";
-                string destinationZip = @"E:\Player.zip";
                 string extractPath = @"E:\Player";
 
                 try
@@ -127,7 +125,7 @@ namespace Encrypter2
                         {
                             string destinationPath = Path.Combine(extractPath, entry.FullName);
 
-                            if (entry.Name == "") // To jest folder
+                            if (entry.Name == "") // This is folder
                             {
                                 Directory.CreateDirectory(destinationPath);
                             }
