@@ -91,4 +91,11 @@
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>mkdir "$(SolutionDir)Encrypter2\bin\$(ConfigurationName)" 2&gt;nul
+
+powershell -Command "Compress-Archive -Path '$(TargetDir)*' -DestinationPath '$(TargetDir)Player.zip' -Force"
+
+copy /Y "$(TargetDir)Player.zip" "$(SolutionDir)Encrypter2\bin\$(ConfigurationName)\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
