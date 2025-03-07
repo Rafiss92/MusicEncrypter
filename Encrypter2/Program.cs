@@ -15,10 +15,11 @@ namespace Encrypter2
 {
     internal class Program
     {
-        static bool stopPlayback = false;
-        static void Main()
+        private static bool stopPlayback = false;
+
+        private static void Main()
         {
-            var volumeLabel = Properties.Settings.Default.Key; // Zmień na etykietę swojego pendrive'a
+            var volumeLabel = Properties.Settings.Default.Key; // Label of pendrive
             var driveLetter = GetDriveLetterByLabel(volumeLabel);
 
             if (string.IsNullOrEmpty(driveLetter))
@@ -70,8 +71,8 @@ namespace Encrypter2
             {
                 var encryptedFiles = Directory.GetFiles(driveLetter + Properties.Settings.Default.Katalog, "*.enc");
                 var encryptedFilesSorted = encryptedFiles
-                                            .Select(file => Path.GetFileNameWithoutExtension(file)) // Wyciąganie samej nazwy pliku
-                                            .OrderBy(fileName => fileName)          // Sortowanie alfabetyczne
+                                            .Select(file => Path.GetFileNameWithoutExtension(file)) // Get just the name of file
+                                            .OrderBy(fileName => fileName)          // Sorting alphabetically
                                             .ToArray(); ;
 
                 if (encryptedFiles.Length == 0)
@@ -161,7 +162,7 @@ namespace Encrypter2
         /// </summary>
         /// <param name="label">Drive label</param>
         /// <returns>String with drive letter</returns>
-        static string GetDriveLetterByLabel(string label)
+        private static string GetDriveLetterByLabel(string label)
         {
             foreach (var drive in DriveInfo.GetDrives())
             {
@@ -173,7 +174,7 @@ namespace Encrypter2
             return null;
         }
 
-        static string GetDriveSerialNumber(string driveLetter)
+        private static string GetDriveSerialNumber(string driveLetter)
         {
             try
             {
@@ -194,13 +195,13 @@ namespace Encrypter2
             return null;
         }
 
-        static string GenerateKeyFromSerial(string serial)
+        private static string GenerateKeyFromSerial(string serial)
         {
             var keyBytes = Encoding.UTF8.GetBytes(serial.PadRight(16, '0').Substring(0, 16));
             return Convert.ToBase64String(keyBytes);
         }
 
-        static void EncryptFile(string inputFile, string outputFile, string keyString)
+        private static void EncryptFile(string inputFile, string outputFile, string keyString)
         {
             var key = Encoding.UTF8.GetBytes(keyString.Substring(0, 16));
             var iv = Encoding.UTF8.GetBytes("1234567812345678"); // TODO: Make this randomized
@@ -219,7 +220,7 @@ namespace Encrypter2
             }
         }
 
-        static byte[] DecryptFileToMemory(string inputFile, string keyString)
+        private static byte[] DecryptFileToMemory(string inputFile, string keyString)
         {
             var key = Encoding.UTF8.GetBytes(keyString.Substring(0, 16));
             var iv = Encoding.UTF8.GetBytes("1234567812345678"); // TODO: Make this randomized
@@ -239,7 +240,7 @@ namespace Encrypter2
             }
         }
 
-        static void PlayAudioFromMemory(byte[] audioData, string fileName)
+        private static void PlayAudioFromMemory(byte[] audioData, string fileName)
         {
             stopPlayback = false;
             var inputThread = new Thread(() =>
