@@ -18,8 +18,8 @@ namespace Encrypter2
         static bool stopPlayback = false;
         static void Main()
         {
-            string volumeLabel = Properties.Settings.Default.Key; // Zmień na etykietę swojego pendrive'a
-            string driveLetter = GetDriveLetterByLabel(volumeLabel);
+            var volumeLabel = Properties.Settings.Default.Key; // Zmień na etykietę swojego pendrive'a
+            var driveLetter = GetDriveLetterByLabel(volumeLabel);
 
             if (string.IsNullOrEmpty(driveLetter))
             {
@@ -28,7 +28,7 @@ namespace Encrypter2
                 return;
             }
 
-            string serialNumber = GetDriveSerialNumber(driveLetter);
+            var serialNumber = GetDriveSerialNumber(driveLetter);
             if (string.IsNullOrEmpty(serialNumber))
             {
                 Console.WriteLine("Nie można odczytać numeru seryjnego pendrive'a.");
@@ -36,18 +36,18 @@ namespace Encrypter2
                 return;
             }
 
-            string key = GenerateKeyFromSerial(serialNumber);
+            var key = GenerateKeyFromSerial(serialNumber);
 
             Console.WriteLine("Co chcesz zrobić?");
             Console.WriteLine("1 - Szyfrowanie");
             Console.WriteLine("2 - Wybór i odszyfrowanie pliku");
             Console.WriteLine("3 - Instalacja/aktualizacja na pendrive (umieść wcześniej plik Player.zip w folderze aplikacji)");
-            string choice = Console.ReadLine();
+            var choice = Console.ReadLine();
 
             if (choice == "1")
             {
-                string folderPath = AppDomain.CurrentDomain.BaseDirectory;
-                string[] audioFiles = Directory.GetFiles(folderPath+ Properties.Settings.Default.Katalog, "*.mp3").Concat(Directory.GetFiles(folderPath + Properties.Settings.Default.Katalog, "*.wav")).ToArray();
+                var folderPath = AppDomain.CurrentDomain.BaseDirectory;
+                var audioFiles = Directory.GetFiles(folderPath+ Properties.Settings.Default.Katalog, "*.mp3").Concat(Directory.GetFiles(folderPath + Properties.Settings.Default.Katalog, "*.wav")).ToArray();
 
                 if (audioFiles.Length == 0)
                 {
@@ -56,9 +56,9 @@ namespace Encrypter2
                 }
                 else
                 {
-                    foreach (string file in audioFiles)
+                    foreach (var file in audioFiles)
                     {
-                        string encryptedFile = Path.Combine(driveLetter+ Properties.Settings.Default.Katalog, Path.GetFileName(file) + ".enc");
+                        var encryptedFile = Path.Combine(driveLetter+ Properties.Settings.Default.Katalog, Path.GetFileName(file) + ".enc");
                         EncryptFile(file, encryptedFile, key);
                         Console.WriteLine($"Plik {Path.GetFileName(file)} został zaszyfrowany.");
                     }
@@ -68,7 +68,7 @@ namespace Encrypter2
             }
             else if (choice == "2")
             {
-                string[] encryptedFiles = Directory.GetFiles(driveLetter + Properties.Settings.Default.Katalog, "*.enc");
+                var encryptedFiles = Directory.GetFiles(driveLetter + Properties.Settings.Default.Katalog, "*.enc");
                 var encryptedFilesSorted = encryptedFiles
                                             .Select(file => Path.GetFileNameWithoutExtension(file)) // Wyciąganie samej nazwy pliku
                                             .OrderBy(fileName => fileName)          // Sortowanie alfabetyczne
@@ -86,17 +86,17 @@ namespace Encrypter2
                     Console.Clear();
                     Console.WriteLine("Dostępne zaszyfrowane pliki:");
 
-                    for (int i = 0; i < encryptedFiles.Length; i++)
+                    for (var i = 0; i < encryptedFiles.Length; i++)
                     {
                         Console.WriteLine($"{i + 1}:\t{Path.GetFileName(encryptedFiles[i])}");
                     }
 
                     Console.Write("\nWybierz numer pliku do odszyfrowania (0 wychodzi z aplikacji): ");
-                    if (int.TryParse(Console.ReadLine(), out int selectedIndex) && selectedIndex > 0 && selectedIndex <= encryptedFiles.Length)
+                    if (int.TryParse(Console.ReadLine(), out var selectedIndex) && selectedIndex > 0 && selectedIndex <= encryptedFiles.Length)
                     {
-                        string selectedFile = encryptedFiles[selectedIndex - 1];
-                        string originalFileName = Path.GetFileNameWithoutExtension(selectedFile);
-                        byte[] decryptedData = DecryptFileToMemory(selectedFile, key);
+                        var selectedFile = encryptedFiles[selectedIndex - 1];
+                        var originalFileName = Path.GetFileNameWithoutExtension(selectedFile);
+                        var decryptedData = DecryptFileToMemory(selectedFile, key);
                         Console.WriteLine("\nPlik odszyfrowany w pamięci, teraz go odtworzymy... Naciśnij klawisz ESC aby przerwać.");
                         PlayAudioFromMemory(decryptedData, originalFileName);
                     }
@@ -113,17 +113,17 @@ namespace Encrypter2
             }
             else if (choice == "3") // Installation on pendrive
             {
-                string appFolder = AppDomain.CurrentDomain.BaseDirectory;
-                string sourceZip = Path.Combine(appFolder, "Player.zip");
-                string extractPath = @"E:\Player";
+                var appFolder = AppDomain.CurrentDomain.BaseDirectory;
+                var sourceZip = Path.Combine(appFolder, "Player.zip");
+                var extractPath = @"E:\Player";
 
                 try
                 {
-                    using (ZipArchive archive = ZipFile.OpenRead(sourceZip))
+                    using (var archive = ZipFile.OpenRead(sourceZip))
                     {
-                        foreach (ZipArchiveEntry entry in archive.Entries)
+                        foreach (var entry in archive.Entries)
                         {
-                            string destinationPath = Path.Combine(extractPath, entry.FullName);
+                            var destinationPath = Path.Combine(extractPath, entry.FullName);
 
                             if (entry.Name == "") // This is folder
                             {
@@ -131,7 +131,7 @@ namespace Encrypter2
                             }
                             else
                             {
-                                string parentDir = Path.GetDirectoryName(destinationPath);
+                                var parentDir = Path.GetDirectoryName(destinationPath);
                                 if (!Directory.Exists(parentDir))
                                 {
                                     Directory.CreateDirectory(parentDir);
@@ -163,7 +163,7 @@ namespace Encrypter2
         /// <returns>String with drive letter</returns>
         static string GetDriveLetterByLabel(string label)
         {
-            foreach (DriveInfo drive in DriveInfo.GetDrives())
+            foreach (var drive in DriveInfo.GetDrives())
             {
                 if (drive.IsReady && drive.VolumeLabel.Equals(label, StringComparison.OrdinalIgnoreCase))
                 {
@@ -177,9 +177,9 @@ namespace Encrypter2
         {
             try
             {
-                string query = "SELECT VolumeSerialNumber FROM Win32_LogicalDisk WHERE DeviceID='" + driveLetter.TrimEnd('\\') + "'";
-                using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(query))
-                using (ManagementObjectCollection results = searcher.Get())
+                var query = "SELECT VolumeSerialNumber FROM Win32_LogicalDisk WHERE DeviceID='" + driveLetter.TrimEnd('\\') + "'";
+                using (var searcher = new ManagementObjectSearcher(query))
+                using (var results = searcher.Get())
                 {
                     foreach (ManagementObject obj in results)
                     {
@@ -196,23 +196,23 @@ namespace Encrypter2
 
         static string GenerateKeyFromSerial(string serial)
         {
-            byte[] keyBytes = Encoding.UTF8.GetBytes(serial.PadRight(16, '0').Substring(0, 16));
+            var keyBytes = Encoding.UTF8.GetBytes(serial.PadRight(16, '0').Substring(0, 16));
             return Convert.ToBase64String(keyBytes);
         }
 
         static void EncryptFile(string inputFile, string outputFile, string keyString)
         {
-            byte[] key = Encoding.UTF8.GetBytes(keyString.Substring(0, 16));
-            byte[] iv = Encoding.UTF8.GetBytes("1234567812345678"); // TODO: Make this randomized
+            var key = Encoding.UTF8.GetBytes(keyString.Substring(0, 16));
+            var iv = Encoding.UTF8.GetBytes("1234567812345678"); // TODO: Make this randomized
 
-            using (Aes aes = Aes.Create())
+            using (var aes = Aes.Create())
             {
                 aes.Key = key;
                 aes.IV = iv;
 
-                using (FileStream fsInput = new FileStream(inputFile, FileMode.Open, FileAccess.Read))
-                using (FileStream fsOutput = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
-                using (CryptoStream cs = new CryptoStream(fsOutput, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                using (var fsInput = new FileStream(inputFile, FileMode.Open, FileAccess.Read))
+                using (var fsOutput = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
+                using (var cs = new CryptoStream(fsOutput, aes.CreateEncryptor(), CryptoStreamMode.Write))
                 {
                     fsInput.CopyTo(cs);
                 }
@@ -221,17 +221,17 @@ namespace Encrypter2
 
         static byte[] DecryptFileToMemory(string inputFile, string keyString)
         {
-            byte[] key = Encoding.UTF8.GetBytes(keyString.Substring(0, 16));
-            byte[] iv = Encoding.UTF8.GetBytes("1234567812345678"); // TODO: Make this randomized
+            var key = Encoding.UTF8.GetBytes(keyString.Substring(0, 16));
+            var iv = Encoding.UTF8.GetBytes("1234567812345678"); // TODO: Make this randomized
 
-            using (Aes aes = Aes.Create())
+            using (var aes = Aes.Create())
             {
                 aes.Key = key;
                 aes.IV = iv;
 
-                using (FileStream fsInput = new FileStream(inputFile, FileMode.Open, FileAccess.Read))
-                using (MemoryStream msOutput = new MemoryStream())
-                using (CryptoStream cs = new CryptoStream(fsInput, aes.CreateDecryptor(), CryptoStreamMode.Read))
+                using (var fsInput = new FileStream(inputFile, FileMode.Open, FileAccess.Read))
+                using (var msOutput = new MemoryStream())
+                using (var cs = new CryptoStream(fsInput, aes.CreateDecryptor(), CryptoStreamMode.Read))
                 {
                     cs.CopyTo(msOutput);
                     return msOutput.ToArray();
@@ -242,7 +242,7 @@ namespace Encrypter2
         static void PlayAudioFromMemory(byte[] audioData, string fileName)
         {
             stopPlayback = false;
-            Thread inputThread = new Thread(() =>
+            var inputThread = new Thread(() =>
             {
                 while (!stopPlayback)
                 {
@@ -254,13 +254,13 @@ namespace Encrypter2
             });
             inputThread.Start();
 
-            using (MemoryStream ms = new MemoryStream(audioData))
+            using (var ms = new MemoryStream(audioData))
             {
-                using (WaveOutEvent outputDevice = new WaveOutEvent())
+                using (var outputDevice = new WaveOutEvent())
                 {
                     if (fileName.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
                     {
-                        using (Mp3FileReader reader = new Mp3FileReader(ms))
+                        using (var reader = new Mp3FileReader(ms))
                         {
                             outputDevice.Init(reader);
                             outputDevice.Play();
@@ -272,7 +272,7 @@ namespace Encrypter2
                     }
                     else if (fileName.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
                     {
-                        using (WaveFileReader reader = new WaveFileReader(ms))
+                        using (var reader = new WaveFileReader(ms))
                         {
                             outputDevice.Init(reader);
                             outputDevice.Play();
